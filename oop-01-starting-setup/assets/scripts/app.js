@@ -12,29 +12,91 @@ class Product {
   }
 }
 
-class ShoppingCart {
-  items = [];
+class ElementAttribute {
+  constructor(attrName, attrValue) {
+    this.name = attrName;
+    this.value = attrValue;
+  }
+}
 
-  addProduct(product) {
-    this.items.push(product);
-    this.totalOutput.innerHTML = `<h2>Total: \$${1}</h2>`;
+class Component {
+  constructor(renderHookId, shouldRender = true) {
+    this.hookId = renderHookId;
+    if (shouldRender) {
+      this.render();
+    }
   }
 
+  render() {}
+
+  createRootElement(tag, cssClasses, attribiutes) {
+    const rootElement = document.createElement(tag);
+    if (cssClasses) {
+      rootElement.className = cssClasses;
+    }
+    if (attribiutes && attribiutes.length > 0) {
+      for (const attr of attribiutes) {
+        rootElement.setAttribute(attr.name, attr.value);
+      }
+    }
+    document.getElementById(this.hookId).append(rootElement);
+    return rootElement;
+  }
+}
+
+class ShoppingCart extends Component {
+  items = [];
+
+  set cartItems(value) {
+    this.items = value;
+    this.totalOutput.innerHTML = `<h2>Total: \$${this.totalAmount.toFixed(
+      2
+    )}</h2>`;
+  }
+
+  get totalAmount() {
+    const sum = this.items.reduce(
+      (prevVal, currItem) => prevVal + currItem.price,
+      0
+    );
+    return sum;
+  }
+
+  constructor(renderHookId) {
+    super(renderHookId, false);
+    this.orderProducts = () => {
+      console.log('Ordering..');
+      console.log(this.items);
+    }
+    this.render();
+  }
+
+  addProduct(product) {
+    const updatedItems = [...this.items];
+    updatedItems.push(product);
+    this.cartItems = updatedItems;
+  }
+
+  
+
   render() {
-    const cartEl = document.createElement('section');
+    const cartEl = this.createRootElement('section', 'cart');
     cartEl.innerHTML = `
       <h2>Total: \$${0}</h2>
       <button>Order Now!</button>
       `;
-    cartEl.className = 'cart';
+    const orderButton = cartEl.querySelector('button');
+    // orderButton.addEventListener('click', () => this.orderProducts());
+    orderButton.addEventListener('click', this.orderProducts);
     this.totalOutput = cartEl.querySelector('h2');
-    return cartEl;
   }
 }
 
-class ProductItem {
-  constructor(product) {
+class ProductItem extends Component {
+  constructor(product, renderHookId) {
+    super(renderHookId, false);
     this.product = product;
+    this.render();
   }
 
   addToCart() {
@@ -42,8 +104,7 @@ class ProductItem {
   }
 
   render() {
-    const prodEl = document.createElement('li');
-    prodEl.className = 'product-item';
+    const prodEl = this.createRootElement('li', 'product-item');
     prodEl.innerHTML = `
         <div> 
           <img src="${this.product.imageUrl}" alt="${this.product.title}" />
@@ -57,62 +118,70 @@ class ProductItem {
       `;
     const addCartButton = prodEl.querySelector('button');
     addCartButton.addEventListener('click', this.addToCart.bind(this));
-    return prodEl;
   }
 }
 
-class ProductList {
-  products = [
-    new Product(
-      'A Pillow',
-      'https://ctl.s6img.com/society6/img/qh9gFHtCny6D4p2ddNw_XvvFdCo/w_700/pillows/~artwork,fw_3500,fh_3500,iw_3500,ih_3500/s6-original-art-uploads/society6/uploads/misc/8f630a3b6f59451683aa4fd6b890a346/~~/pastel-purple-lilac-lavendar-solid-color-pillows.jpg',
-      'A soft pillow!',
-      19.99
-    ),
-    new Product(
-      'A Carpet',
-      'https://cdn.shopify.com/s/files/1/0257/0682/3733/products/fraserr_600x.jpg?v=1655825367',
-      'A carpet which you might like - or not.',
-      89.99
-    )
-  ];
+class ProductList extends Component {
+  #products = [];
 
-  constructor() {}
-  render() {
-    const prodList = document.createElement('ul');
-    prodList.className = 'product-list';
-    for (const prod of this.products) {
-      const productItem = new ProductItem(prod);
-      const prodEl = productItem.render();
-      prodList.append(prodEl);
+  constructor(renderHookId) {
+    super(renderHookId, false);
+    this.render();
+    this.fetchProducts();
+  }
+
+  fetchProducts() {
+    this.#products = [
+      new Product(
+        'A Pillow',
+        'https://ctl.s6img.com/society6/img/qh9gFHtCny6D4p2ddNw_XvvFdCo/w_700/pillows/~artwork,fw_3500,fh_3500,iw_3500,ih_3500/s6-original-art-uploads/society6/uploads/misc/8f630a3b6f59451683aa4fd6b890a346/~~/pastel-purple-lilac-lavendar-solid-color-pillows.jpg',
+        'A soft pillow!',
+        19.99
+      ),
+      new Product(
+        'A Carpet',
+        'https://cdn.shopify.com/s/files/1/0257/0682/3733/products/fraserr_600x.jpg?v=1655825367',
+        'A carpet which you might like - or not.',
+        89.99
+      )
+    ];
+    this.renderProducts();
+  }
+
+  renderProducts() {
+    for (const prod of this.#products) {
+      new ProductItem(prod, 'prod-list');
     }
-    return prodList;
+  }
+  render() {
+    this.createRootElement('ul', 'product-list', [
+      new ElementAttribute('id', 'prod-list')
+    ]);
+    if (this.#products && this.#products.length > 0) {
+      this.renderProducts();
+    }
   }
 }
 
 class Shop {
+  constructor() {
+    this.render();
+  }
   render() {
-    const renderHook = document.getElementById('app');
-    this.cart = new ShoppingCart();
-    const cartEl = this.cart.render();
-    const productList = new ProductList();
-    const prodList = productList.render();
-
-    renderHook.append(cartEl);
-    renderHook.append(prodList);
+    this.cart = new ShoppingCart('app');
+    new ProductList('app');
   }
 }
 
 class App {
-  static cart; 
-  
+  static cart;
+
   static init() {
     const shop = new Shop();
-    shop.render();
     this.cart = shop.cart;
   }
 
-  static addProductToCart(product){
+  static addProductToCart(product) {
     this.cart.addProduct(product);
   }
 }
