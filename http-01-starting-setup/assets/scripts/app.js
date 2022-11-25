@@ -55,9 +55,9 @@ function sendHttpRequest(method, url, data) {
 
 async function fetchPosts() {
   try {
-    const responseData = await sendHttpRequest('GET', db);
+    const response = await axios.get(db);
     // const listofPosts = JSON.parse(xhr.response);
-    const listofPosts = responseData;
+    const listofPosts = response.data;
     for (post of listofPosts) {
       const postEl = document.importNode(postTemplate.content, true);
       postEl.querySelector('h2').textContent = post.title.toUpperCase();
@@ -66,7 +66,8 @@ async function fetchPosts() {
       listElement.append(postEl);
     }
   } catch (error) {
-    console.log(error.message);
+    alert(error.message);
+    console.log(error.response);
   }
 }
 
@@ -83,7 +84,8 @@ async function createPost(title, content) {
   // fd.append('body', content);
   fd.append('userId', userId);
 
-  await sendHttpRequest('POST', db, fd);
+  const response = await axios.post(db, post);
+  console.log(response);
 }
 
 fetchButton.addEventListener('click', () => {
@@ -100,6 +102,6 @@ form.addEventListener('submit', (e) => {
 postList.addEventListener('click', (event) => {
   if (event.target.tagName === 'BUTTON') {
     const postId = event.target.closest('li').id;
-    sendHttpRequest('Delete', `${db}/${postId}`);
+    axios.delete(`${db}/${postId}`);
   }
 });
