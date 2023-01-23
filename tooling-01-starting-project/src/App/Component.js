@@ -1,7 +1,7 @@
-export function doSomething() {};
+export function doSomething () {}
 
 export default class {
-  constructor(hostElementId, insertBefore = false) {
+  constructor (hostElementId, insertBefore = false) {
     if (hostElementId) {
       this.hostElement = document.getElementById(hostElementId);
     } else {
@@ -10,14 +10,14 @@ export default class {
     this.insertBefore = insertBefore;
   }
 
-  detach() {
+  detach () {
     if (this.element) {
       this.element.remove();
       // this.element.parentElement.removeChild(this.element);
     }
   }
 
-  attach() {
+  attach () {
     this.hostElement.insertAdjacentElement(
       this.insertBefore ? 'afterbegin' : 'beforeend',
       this.element

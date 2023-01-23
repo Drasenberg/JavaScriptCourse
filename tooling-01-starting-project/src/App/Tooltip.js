@@ -1,21 +1,20 @@
-import Cmp, { doSomething } from './Component.js';
+import Cmp from './Component';
 
 console.log('Tooltip running');
 
 export class Tooltip extends Cmp {
-  constructor(closeNotifierFunction, text, hostElementId) {
+  constructor (closeNotifierFunction, text, hostElementId) {
     super(hostElementId);
     this.closeNotifier = closeNotifierFunction;
     this.text = text;
+    this.closeTooltip = () => {
+      this.detach();
+      this.closeNotifier();
+    };
     this.create();
   }
 
-  closeTooltip = () => {
-    this.detach();
-    this.closeNotifier();
-  };
-
-  create() {
+  create () {
     const tooltipElement = document.createElement('div');
     tooltipElement.className = 'card';
     const tooltipTemplate = document.getElementById('tooltip');

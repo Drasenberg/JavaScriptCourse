@@ -1,26 +1,27 @@
-import { DOMHelper } from '../Utility/DOMHelper.js';
+import { DOMHelper } from '../Utility/DOMHelper';
 // import { Tooltip } from './Tooltip.js';
 
 console.log('Project Item created!');
 
 export class ProjectItem {
-  hasActiveTooltip = false;
+  // hasActiveTooltip = false;
 
-  constructor(id, updateProjectListsFunction, type) {
+  constructor (id, updateProjectListsFunction, type) {
     this.id = id;
+    this.hasActiveTooltip = false;
     this.updateProjectListsHandler = updateProjectListsFunction;
     this.connectMoreInfoButton();
     this.connectSwitchButton(type);
     this.connectDrag();
   }
 
-  showMoreInfoHandler() {
+  showMoreInfoHandler () {
     if (this.hasActiveTooltip) {
       return;
     }
     const projectElement = document.getElementById(this.id);
     const tooltipText = projectElement.dataset.extraInfo;
-    import('./Tooltip.js').then(module => {
+    import('./Tooltip').then(module => {
       const tooltip = new module.Tooltip(
         () => {
           this.hasActiveTooltip = false;
@@ -31,10 +32,9 @@ export class ProjectItem {
       tooltip.attach();
       this.hasActiveTooltip = true;
     });
-   
   }
 
-  connectDrag() {
+  connectDrag () {
     const item = document.getElementById(this.id);
     item.addEventListener('dragstart', event => {
       event.dataTransfer.setData('text/plain', this.id);
@@ -46,7 +46,7 @@ export class ProjectItem {
     });
   }
 
-  connectMoreInfoButton() {
+  connectMoreInfoButton () {
     const projectItemElement = document.getElementById(this.id);
     const moreInfoBtn = projectItemElement.querySelector(
       'button:first-of-type'
@@ -54,7 +54,7 @@ export class ProjectItem {
     moreInfoBtn.addEventListener('click', this.showMoreInfoHandler.bind(this));
   }
 
-  connectSwitchButton(type) {
+  connectSwitchButton (type) {
     const projectItemElement = document.getElementById(this.id);
     let switchBtn = projectItemElement.querySelector('button:last-of-type');
     switchBtn = DOMHelper.clearEventListeners(switchBtn);
@@ -65,7 +65,7 @@ export class ProjectItem {
     );
   }
 
-  update(updateProjectListsFn, type) {
+  update (updateProjectListsFn, type) {
     this.updateProjectListsHandler = updateProjectListsFn;
     this.connectSwitchButton(type);
   }
