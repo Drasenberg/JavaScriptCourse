@@ -9,7 +9,6 @@ module.exports = {
     path: path.resolve(__dirname, 'assets', 'scripts'),
     publicPath: 'assets/scripts/'
   },
-  devtool: 'cheap-module-eval-source-map',
   // devServer: {
   //   contentBase: './'
   // }
