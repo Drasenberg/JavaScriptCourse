@@ -1,9 +1,12 @@
-import { ProjectList } from './App/ProjectList.js';
+import * as _ from 'lodash/array';
+import { ProjectList } from './App/ProjectList';
 
-globalThis.DEFAULT_VALUE = "Max";
+globalThis.DEFAULT_VALUE = 'MAX';
+
+console.log(_.difference([0, 1], [1, 2]));
 
 class App {
-  static init() {
+  static init () {
     const activeProjectsList = new ProjectList('active');
     const finishedProjectsList = new ProjectList('finished');
     activeProjectsList.setSwitchHandlerFunction(
@@ -20,7 +23,7 @@ class App {
     // });
   }
 
-  static startAnalytics() {
+  static startAnalytics () {
     const analyticsScript = document.createElement('script');
     analyticsScript.src = 'assets/scripts/Utility/Analytics.js';
     analyticsScript.defer = true;
